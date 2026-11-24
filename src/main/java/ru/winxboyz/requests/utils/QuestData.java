@@ -148,7 +148,7 @@ public class QuestData {
         List<Component> pages = new ArrayList<>(1);
 
         int i = 0, symbolsPerPage = 150;
-        Component component = Component.text("").append(Component.text(this.displayName + "\n\n")).color(NamedTextColor.DARK_AQUA).decorate(TextDecoration.BOLD);
+        Component component = Component.text("").append(Component.text(this.displayName + "\n\n").color(NamedTextColor.DARK_AQUA).decorate(TextDecoration.BOLD));
         do {
             int endIndex = Math.min((i+1)*symbolsPerPage, description.length());
             String pageText = description.substring(i*symbolsPerPage, endIndex);
