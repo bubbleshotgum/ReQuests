@@ -60,14 +60,15 @@ public class QuestManager {
     }
 
     public void takeQuest(Player player, QuestData quest) {
-        if(!progress.containsKey(player.getUniqueId()))
-            addPlayer(player);
+        UUID playerUUID = player.getUniqueId();
+        List<Tracker> trackers = progress.computeIfAbsent(playerUUID, k -> new ArrayList<>());
+        String questName = quest.getDisplayName();
         if(!hasQuest(player, quest)) {
-            progress.get(player.getUniqueId()).add(new Tracker(quest, System.currentTimeMillis()));
-            player.sendActionBar(Component.text("Квест \"" + quest.getDisplayName() + "\" взят").color(NamedTextColor.GREEN));        
+            trackers.add(new Tracker(quest, System.currentTimeMillis()));
+            player.sendActionBar(Component.text("Квест \"" + questName + "\" взят").color(NamedTextColor.GREEN));        
             player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0F, 1.0F);
         } else {
-            player.sendActionBar(Component.text("Квест \"" + quest.getDisplayName() + "\" уже активен!").color(NamedTextColor.RED));
+            player.sendActionBar(Component.text("Квест \"" + questName + "\" уже активен!").color(NamedTextColor.RED));
             player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
         }
     }

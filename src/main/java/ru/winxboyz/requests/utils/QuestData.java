@@ -133,7 +133,7 @@ public class QuestData {
         long duration, long cooldown,
         BiConsumer<Player,QuestData> callback
     ) {
-        
+        final Duration MAX_LIFETIME = Duration.ofDays(14);
         if(cooldown < duration) throw new IllegalArgumentException("Cooldown cannot be less than duration");
         
         this.cooldown = cooldown;
@@ -194,7 +194,7 @@ public class QuestData {
                 }
             }, ClickCallback.Options.builder()
                 .uses(ClickCallback.UNLIMITED_USES)
-                .lifetime(Duration.ZERO)
+                .lifetime(MAX_LIFETIME)
                 .build())
         ))
         .append(Component.text("Отклонить\n").color(NamedTextColor.RED).decorate(TextDecoration.BOLD)
@@ -205,7 +205,7 @@ public class QuestData {
                 }
             }, ClickCallback.Options.builder()
                 .uses(ClickCallback.UNLIMITED_USES)
-                .lifetime(Duration.ZERO)
+                .lifetime(MAX_LIFETIME)
                 .build())
         )));
 
