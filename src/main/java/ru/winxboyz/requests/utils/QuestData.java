@@ -16,7 +16,7 @@ import org.bukkit.inventory.meta.BookMeta;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventire.text.event.ClickCallback;
+import net.kyori.adventure.text.event.ClickCallback;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 
@@ -148,7 +148,7 @@ public class QuestData {
         List<Component> pages = new ArrayList<>(1);
 
         int i = 0, symbolsPerPage = 150;
-        Component component = Component.text("").append(this.displayName+"\n\n").color(NamedTextColor.DARK_AQUA).decorate(TextDecoration.BOLD);
+        Component component = Component.text("").append(Component.text(this.displayName + "\n\n")).color(NamedTextColor.DARK_AQUA).decorate(TextDecoration.BOLD);
         do {
             int endIndex = Math.min((i+1)*symbolsPerPage, description.length());
             String pageText = description.substring(i*symbolsPerPage, endIndex);
@@ -192,10 +192,10 @@ public class QuestData {
                     callback.accept(player,this);
                     player.closeInventory();
                 }
-            }),
-            ClickCallback.Options.builder()
+            }, ClickCallback.Options.builder()
                 .uses(ClickCallback.UNLIMITED_USES)
                 .lifetime(Duration.ZERO)
+                .build())
         ))
         .append(Component.text("Отклонить\n").color(NamedTextColor.RED).decorate(TextDecoration.BOLD)
         .clickEvent(
@@ -203,10 +203,10 @@ public class QuestData {
                 if(audience instanceof Player player) {
                     player.closeInventory();
                 }
-            }),
-            ClickCallback.Options.builder()
+            }, ClickCallback.Options.builder()
                 .uses(ClickCallback.UNLIMITED_USES)
                 .lifetime(Duration.ZERO)
+                .build())
         )));
 
         BookMeta meta = (BookMeta) book.getItemMeta();

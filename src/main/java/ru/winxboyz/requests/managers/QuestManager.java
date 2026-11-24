@@ -137,7 +137,9 @@ public class QuestManager {
         if(objectives == null || objectives.size() == 0) return null;
         List<ItemStack> items = new ArrayList<>();
         for(QuestObjective objective : objectives) {
-            items.add(Material.matchMaterial(objective.getTarget()), objective.getAmount());
+            Material material = Material.matchMaterial(objective.getTarget());
+            if(material == null) continue;
+            items.add(new ItemStack(material, objective.getAmount()));
         }
         return items;
     }

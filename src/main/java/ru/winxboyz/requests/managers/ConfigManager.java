@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
 
 import ru.winxboyz.requests.ReQuests;
 import ru.winxboyz.requests.utils.ObjectiveType;
