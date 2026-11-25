@@ -21,11 +21,8 @@ public class ConfigManager {
 
     private final ReQuests plugin;
 
-    // private String dbName;
-
     private ConfigurationSection
         localeSection,
-        // sqlSection,
         questsSection;
 
     private final List<QuestData> quests = new ArrayList<>();
@@ -39,21 +36,14 @@ public class ConfigManager {
     }
 
     public void loadConfig() {
-        // Чистим перед загрузкой: без этого при reload квесты и сообщения
-        // накапливались бы в списках, а в режиме "квеста не заданы" ещё и двоились.
         quests.clear();
         messages.clear();
 
         plugin.setLocale(plugin.getConfig().getString("locale","en"));
         
-        // sqlSection     = plugin.getConfig().getConfigurationSection("sql");
         localeSection  = plugin.getConfig().getConfigurationSection("locales." + plugin.getLocale());
         questsSection  = plugin.getConfig().getConfigurationSection("quests");
 
-        // if(sqlSection == null) {
-        //     plugin.getLogger().severe("No SQL connection credentials specified");
-        //     return;
-        // }
         BiConsumer<Player,QuestData> takeQuest = plugin.getManagers().getQuestManager()::takeQuest;
         if(questsSection == null) {
             plugin.getLogger().warning("No quests specified in config, creating default quests");
@@ -133,29 +123,6 @@ public class ConfigManager {
         if(localeSection != null)
             for(String key : localeSection.getKeys(false))
                 messages.put(key, localeSection.getString(key));
-
-        // plugin.setTableName(sqlSection.getString("locationsTable"));
-        // if(dbName == null || !dbName.equals(sqlSection.getString("database"))) {
-        //     dbName = sqlSection.getString("database","reore");
-        //     PluginManager.getInstance().getDatabaseManager().close();
-        //     PluginManager.getInstance().getDatabaseManager().connect(dbName);
-        // }
-        // PluginManager.getInstance().getDatabaseManager().createTableLocations().thenAccept(res -> {
-        //     PluginManager.getInstance().getDatabaseManager().fetchLocations().thenAccept(locs -> {
-        //         for(Location loc : locs) {
-        //             ResourceData data = plugin.getResources().stream().filter(
-        //                 rd -> loc.getBlock().getType().equals(rd.getResource())
-        //             ).findFirst().orElse(null);
-        //             if(data == null) {
-        //                 plugin.getLogger().warning("Could not find resource data for block at "
-        //                 + loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ()
-        //                 + " in world " + loc.getWorld().getName());
-        //                 continue;
-        //             }
-        //             plugin.getProgress().put(loc, data);
-        //         }
-        //     });
-        // });
     }
 
     public ConfigManager(ReQuests plugin) {

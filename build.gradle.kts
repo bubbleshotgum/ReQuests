@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "ru.winxboyz.requests"
-version = "1.0.0-SNAPSHOT"
+version = "0.2.1"
 
 repositories {
     mavenCentral()

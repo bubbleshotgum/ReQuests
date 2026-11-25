@@ -160,12 +160,12 @@ public class QuestManager {
             List<QuestObjective> objectives = tracker.getQuest().queryObjectives(ObjectiveType.CRAFT, items.getType().getKey().toString());
             if(objectives.size() == 0) continue;
 
-            int[] tracks = tracker.getProgress();
+            // int[] tracks = tracker.getProgress();
             for(QuestObjective objective : objectives) {
                 int index = objectiveIndex(tracker, objective);
-                if(objective.getAmount() <= tracks[index]) continue;
-                tracks[index] += items.getAmount();
-                if(objective.getAmount() <= tracks[index])
+                if(objective.getAmount() <= tracker.getProgress(index)) continue;
+                tracker.increaseProgress(index,items.getAmount());
+                if(objective.getAmount() <= tracker.getProgress(index))
                     checkCompletion(player, tracker);
             }
         }
@@ -178,12 +178,12 @@ public class QuestManager {
             List<QuestObjective> objectives = tracker.getQuest().queryObjectives(ObjectiveType.SMELT, items.getType().getKey().toString());
             if(objectives.size() == 0) continue;
 
-            int[] tracks = tracker.getProgress();
+            // int[] tracks = tracker.getProgress();
             for(QuestObjective objective : objectives) {
                 int index = objectiveIndex(tracker, objective);
-                if(objective.getAmount() <= tracks[index]) continue;
-                tracks[index] += items.getAmount();
-                if(objective.getAmount() <= tracks[index])
+                if(objective.getAmount() <= tracker.getProgress(index)) continue;
+                tracker.increaseProgress(index,items.getAmount());
+                if(objective.getAmount() <= tracker.getProgress(index))
                     checkCompletion(player, tracker);
             }
         }
@@ -196,27 +196,27 @@ public class QuestManager {
         if(tracker.isOnCooldown()) return;
         List<QuestObjective> objectives = tracker.getQuest().queryObjectives(ObjectiveType.GIVE);
         if(objectives.size() == 0) return;
-        int[] tracks = tracker.getProgress();
+        // int[] tracks = tracker.getProgress();
         // List<ItemStack> items = getItems(npcId, npcName, ObjectiveType.GIVE);
         // if(items == null || items.size() == 0) return;
         for(QuestObjective objective : objectives) {
             // if(!items.getType().getKey().asString().equals(objective.getTarget()))
             //     continue;
             int index = objectiveIndex(tracker, objective);
-            if(objective.getAmount() <= tracks[index]) continue;
+            if(objective.getAmount() <= tracker.getProgress(index)) continue;
 
             ItemStack[] inventory = player.getInventory().getContents();
             for(ItemStack item : inventory) {
                 if(item != null && item.getType().getKey().asString().equals(objective.getTarget())) {
                     int amount = item.getAmount();
-                    if(amount + tracks[index] >= objective.getAmount()) {
-                        item.setAmount(amount + tracks[index] - objective.getAmount());
-                        tracks[index] = objective.getAmount();
+                    if(amount + tracker.getProgress(index) >= objective.getAmount()) {
+                        item.setAmount(amount + tracker.getProgress(index) - objective.getAmount());
+                        tracker.setProgress(index,objective.getAmount());
                         checkCompletion(player, tracker);
                         break;
                     }
                     item.setAmount(0);
-                    tracks[index] += amount;
+                    tracker.increaseProgress(index,amount);
                 }
             }
         }
@@ -233,7 +233,7 @@ public class QuestManager {
         }
         // List<Inventory> questList = new ArrayList<>();
         int
-            totalMissionsPerPage = 1,
+            totalMissionsPerPage = 18,
             totalPages = trackers.size() / totalMissionsPerPage + 1;
         JournalHolder journal = new JournalHolder();
         for(int i = 0; i < totalPages; i++) {
@@ -244,18 +244,18 @@ public class QuestManager {
                     break;
                 Tracker t = trackers.get(index);
                 QuestData quest = t.getQuest();
-                int[] questProgress = t.getProgress();
+                // int[] questProgress = t.getProgress();
                 
                 ItemStack q = new ItemStack(Material.PAPER);
                 ItemMeta meta = q.getItemMeta();
                 meta.displayName(Component.text(quest.getDisplayName()).color(NamedTextColor.DARK_AQUA).decorate(TextDecoration.ITALIC));
                 
                 List<Component> lore = new ArrayList<>();
-                for(int k = 0; k < questProgress.length; k++) {
+                for(int k = 0; k < t.getProgressLength(); k++) {
                     QuestObjective objective = quest.getObjectives().get(k);
                     lore.add(QuestData.objectiveComponent(objective));
                     lore.set(lore.size()-1, lore.get(lore.size()-1).append(
-                        Component.text(": " + questProgress[k] + "/" + objective.getAmount()).color(NamedTextColor.GOLD)
+                        Component.text(": " + t.getProgress(k) + "/" + objective.getAmount()).color(NamedTextColor.GOLD)
                     ));
                 }
 
@@ -274,8 +274,8 @@ public class QuestManager {
     }
 
     public void checkCompletion(Player player, Tracker tracker) {
-        for(int i = 0; i < tracker.getProgress().length; i++)
-            if(tracker.getProgress()[i] < tracker.getQuest().getObjectives().get(i).getAmount())
+        for(int i = 0; i < tracker.getProgressLength(); i++)
+            if(tracker.getProgress(i) < tracker.getQuest().getObjectives().get(i).getAmount())
                 return;
         handleReward(player, tracker.getQuest());
         tracker.sendOnCooldown();
@@ -284,7 +284,7 @@ public class QuestManager {
     public void handleReward(Player player, QuestData quest) {
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
         
-        Component message = Component.text("Вы выполнили квест: " + quest.getDisplayName() + "!")
+        Component message = Component.text("Вы выполнили квест: " + quest.getDisplayName() + "!\n")
             .color(NamedTextColor.GREEN)
             .append(Component.text("Награды:\n").color(NamedTextColor.YELLOW));
 

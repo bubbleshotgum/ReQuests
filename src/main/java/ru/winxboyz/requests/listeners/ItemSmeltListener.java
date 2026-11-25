@@ -24,7 +24,7 @@ public class ItemSmeltListener implements Listener {
     private final InventoryManager  inventoryManager;
 
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void ItemFurnacePutListener(InventoryClickEvent event) {
         Inventory clickedInventory = event.getClickedInventory();
 
@@ -52,7 +52,7 @@ public class ItemSmeltListener implements Listener {
         inventoryManager.handleClick(block, player, event.getSlot(), event.getCursor(), event.getCurrentItem());
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onItemSmelt(FurnaceSmeltEvent event) {
         ItemStack result = event.getResult();
         Block block = event.getBlock();

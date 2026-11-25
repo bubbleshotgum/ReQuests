@@ -6,9 +6,10 @@ import java.util.function.BiConsumer;
 
 import java.time.Duration;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
@@ -66,10 +67,23 @@ public class QuestData {
     // }
 
     public static Component fromKey(String key, ObjectiveType type) {
-        String replacedKey = key.replace(":", ".");
-        if(ObjectiveType.KILL == type) 
-            return Component.translatable("entity." + replacedKey);
-        return Component.translatable("item." + replacedKey);
+        NamespacedKey namespacedKey = NamespacedKey.fromString(key);
+        if (namespacedKey == null) {
+            return Component.text(key);
+        }
+
+        if (type == ObjectiveType.KILL) {
+            EntityType entityType = Registry.ENTITY_TYPE.get(namespacedKey);
+            if (entityType != null) {
+                return Component.translatable(entityType);
+            }
+        } else {
+            Material material = Registry.MATERIAL.get(namespacedKey);
+            if (material != null) {
+                return Component.translatable(material);
+            }
+        }
+        return Component.text(key);
     }
 
     public List<QuestObjective> getObjectives() {

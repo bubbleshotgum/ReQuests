@@ -12,7 +12,7 @@ public class ItemCraftListener implements Listener {
 
     private QuestManager manager;
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onItemCrafted(CraftItemEvent event) {
         ItemStack result = event.getRecipe().getResult();
         Player player = (Player) event.getWhoClicked();
