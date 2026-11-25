@@ -312,7 +312,8 @@ public class QuestManager {
     }
 
     public void addPlayer(Player player) {
-        progress.put(player.getUniqueId(), new ArrayList<>());
+        if(progress.get(player.getUniqueId()) == null)
+            progress.put(player.getUniqueId(), new ArrayList<>());
     }
 
     public void removePlayer(Player player) {
