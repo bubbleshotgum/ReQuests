@@ -15,7 +15,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.ClickCallback;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -56,16 +55,6 @@ public class QuestData {
         return npc;
     }
 
-    // public static Material getMaterial(String identifier) {
-    //     return Material.matchMaterial(identifier);
-    // }
-
-    // public static Component fromMaterial(Material material) {
-    //     if(material == null)
-    //         return Component.text("");
-    //     return Component.translatable(material);
-    // }
-
     public static Component fromKey(String key, ObjectiveType type) {
         NamespacedKey namespacedKey = NamespacedKey.fromString(key);
         if (namespacedKey == null) {
@@ -78,6 +67,21 @@ public class QuestData {
                 return Component.translatable(entityType);
             }
         } else {
+            Material material = Registry.MATERIAL.get(namespacedKey);
+            if (material != null) {
+                return Component.translatable(material);
+            }
+        }
+        return Component.text(key);
+    }
+
+    public static Component fromKey(String key, RewardType type) {
+        NamespacedKey namespacedKey = NamespacedKey.fromString(key);
+        if (namespacedKey == null) {
+            return Component.text(key);
+        }
+
+        if (type == RewardType.ITEM) {
             Material material = Registry.MATERIAL.get(namespacedKey);
             if (material != null) {
                 return Component.translatable(material);
@@ -140,6 +144,20 @@ public class QuestData {
         String objectiveString = objectiveText.toString();
         return Component.text(objectiveString).append(type).append(Component.text("\n"));
     }
+    public static Component rewardComponent(QuestReward reward) {
+        StringBuilder rewardText = new StringBuilder().append("- ");
+        switch(reward.getType()) {
+            case RewardType.EXP  -> rewardText.append(reward.getAmount()).append("ед. опыта");
+            case RewardType.MONEY  -> rewardText.append("$").append(reward.getAmount());
+            case RewardType.ITEM -> rewardText.append(reward.getAmount()).append(" ");
+        }
+        String rewardString = rewardText.toString();
+        return Component.text(rewardString).append(
+            RewardType.ITEM == reward.getType() ?
+            fromKey(reward.getIdentifier(), reward.getType()) :
+            Component.text("")
+        ).append(Component.text("\n"));
+    }
 
     public QuestData(
         String name, String displayName, String description, String npc,
@@ -171,32 +189,27 @@ public class QuestData {
             component = Component.text("");
         } while(i++ < description.length() / symbolsPerPage);
 
-        if(((TextComponent)pages.getLast()).content().length() * 3 >= symbolsPerPage)
-            pages.add(Component.text(""));
-        pages.set(pages.size()-1,pages.getLast().append(Component.text("\n\nЦель:\n").decorate(TextDecoration.BOLD)));
-
+        // if(((TextComponent)pages.getLast()).content().length() * 3 >= symbolsPerPage)
+        pages.add(
+            Component.text("").append(
+                Component.text("Цель:\n")
+                .color(NamedTextColor.DARK_AQUA)
+                .decorate(TextDecoration.BOLD)
+            )
+        );
+    
         for(QuestObjective objective : objectives) {
             pages.set(pages.size()-1,pages.getLast().append(objectiveComponent(objective)));
         }
-        
-        if(((TextComponent)pages.getLast()).content().length() * 3 >= symbolsPerPage)
-            pages.add(Component.text(""));
-        pages.set(pages.size()-1,pages.getLast().append(Component.text("\nНаграда:\n").decorate(TextDecoration.BOLD)));
+        pages.add(
+            Component.text("").append(
+                Component.text("Награда:\n")
+                .color(NamedTextColor.DARK_AQUA)
+                .decorate(TextDecoration.BOLD)
+            )
+        );
         for(QuestReward reward : rewards) {
-            StringBuilder rewardText = new StringBuilder().append("- ");
-            switch(reward.getType()) {
-                case RewardType.EXP:
-                    rewardText.append(reward.getAmount()).append(" опыта\n");
-                    break;
-                case RewardType.MONEY:
-                    rewardText.append("$").append(reward.getAmount()).append("\n");
-                    break;
-                case RewardType.ITEM:
-                    String itemName = Material.matchMaterial(reward.getIdentifier()).name();
-                    rewardText.append(reward.getAmount()).append(" ").append(itemName).append("\n");
-                    break;
-            }
-            pages.set(pages.size()-1,pages.getLast().append(Component.text(rewardText.toString())));
+            pages.set(pages.size()-1,pages.getLast().append(rewardComponent(reward)));
         }
         pages.set(pages.size()-1,pages.getLast()
         .append(Component.text("Принять\n").color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD)

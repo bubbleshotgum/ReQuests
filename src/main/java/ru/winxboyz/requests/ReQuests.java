@@ -14,6 +14,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.milkbowl.vault.economy.Economy;
 import ru.winxboyz.requests.commands.JournalCommand;
+import ru.winxboyz.requests.commands.ReQuestsCommand;
 import ru.winxboyz.requests.listeners.FurnaceBreakListener;
 import ru.winxboyz.requests.listeners.ItemCraftListener;
 import ru.winxboyz.requests.listeners.ItemSmeltListener;
@@ -114,7 +115,7 @@ public class ReQuests extends JavaPlugin {
         });
 
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
-            // commands.registrar().register(new ReQuestsCommand(this).initialize());
+            commands.registrar().register(new ReQuestsCommand(this).initialize());
             commands.registrar().register(new JournalCommand(pluginManager.getQuestManager()).initialize());
         });
         getServer().getPluginManager().registerEvents(new NpcInteractListener(pluginManager.getQuestManager()), this);
